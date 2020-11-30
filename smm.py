@@ -131,7 +131,7 @@ def draw():
 	if(selected != "none"):
 		pg.draw.circle(screen, yellow, selected, 40, width = 10)
 
-
+curr = "none"
 turn = 0
 #This function is for placing down tiles
 def place():
@@ -145,8 +145,6 @@ def place():
 					tiles[key] = "Blue"
 				else:
 					tiles[key] = "Red"
-
-
 				if morrisChecker(curr) == False:
 					turn = turn + 1
 
@@ -167,7 +165,7 @@ def moveSelecter():
 					if(tiles[key]) == "Blue":
 						selected = coordDict[key]
 
-curr = "none"
+
 #This function draws a tile where the user chooses to move to as well as removing the tile from the old spot
 def moveHelper():
 	global selected
@@ -242,35 +240,49 @@ def deletion():
 def morrisChecker(tile):
 	piece = tile
 	line = []
+	global curr
 
 	if tiles["a"] == tiles["b"] == tiles["c"] and tiles["a"] != "none":
 		line = ["a", "b", "c"]
+		if curr in line:
+			return True
 
 	if tiles["a"] == tiles["h"] == tiles["g"] and tiles["a"] != "none":
 		line = ["a", "h", "g"]
+		if curr in line:
+			return True
 
 	if tiles["c"] == tiles["d"] == tiles["e"] and tiles["e"] != "none":
 		line = ["c", "d", "e"]
+		if curr in line:
+			return True
 
 	if tiles["e"] == tiles["f"] == tiles["g"] and tiles["e"] != "none":
 		line = ["e", "f", "g"]
+		if curr in line:
+			return True
 
 	if tiles["j"] == tiles["k"] == tiles["l"] and tiles["j"] != "none":
 		line = ["j", "k", "l"]
+		if curr in line:
+			return True
 
 	if tiles["j"] == tiles["i"] == tiles["p"] and tiles["j"] != "none":
 		line = ["j", "i", "p"]
+		if curr in line:
+			return True
 
 	if tiles["l"] == tiles["m"] == tiles["n"] and tiles["n"] != "none":
 		line = ["l", "m", "n"]
+		if curr in line:
+			return True
 
 	if tiles["n"] == tiles["o"] == tiles["p"] and tiles["n"] != "none":
 		line = ["n", "o", "p"]
+		if curr in line:
+			return True
 
-	if piece in line:
-		return True
-	else:
-		return False
+	return False
 
 
 def winner():
@@ -300,7 +312,7 @@ while(True):
 	x, y = pg.mouse.get_pos()
 
 	draw()
-
+	
 	if morrisChecker(curr):
 		if event.type == pg.MOUSEBUTTONUP:
 			deletion()
