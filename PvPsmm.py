@@ -4,8 +4,6 @@ import sys
 import time
 from pygame.locals import *
 
-import random
-
 # set width and height of the game window
 w = 800
 h = 800
@@ -226,17 +224,16 @@ def deletion():
 		if tiles[key] != "none":
 			if coordDict[key][0]-40 <= x <= coordDict[key][0]+40 and coordDict[key][1]-40 <= y <= coordDict[key][1]+40:
 				global turn
-				if event.type == pg.MOUSEBUTTONDOWN:
-					if(turn % 2 == 1):
-						if(tiles[key]) == "Blue":
-							tiles[key] = "none"
-							curr = "none"
-							turn = turn + 1
-					else:
-						if(tiles[key]) == "Red":
-							tiles[key] = "none"
-							curr = "none"
-							turn = turn + 1
+				if(turn % 2 == 1):
+					if(tiles[key]) == "Blue":
+						tiles[key] = "none"
+						curr = "none"
+						turn = turn + 1
+				else:
+					if(tiles[key]) == "Red":
+						tiles[key] = "none"
+						curr = "none"
+						turn = turn + 1
 
 
 #[WORK IN PROGRESS]
@@ -306,59 +303,6 @@ def winner():
 	return victor
 
 
-def getCurrColor(color):
-	currColorList = []
-	for x in tiles:
-		if tiles[x] == color:
-			currColorList.append(x)
-	return currColorList
-
-
-def minimaxPlace():
-	global turn
-	global curr
-	x = random.randint(0, 15)
-	temp = []
-	for y in tiles:
-		temp.append(y)
-	next = temp[x]
-	if tiles[next] == "none":
-		tiles[next] = "Red"
-		curr = next
-		if morrisChecker(curr) == False:
-			turn = turn + 1
-	else:
-		minimaxPlace()
-
-def minimaxMove():
-	global turn
-	global curr
-	reds = getCurrColor("Red")
-	x = random.randint(0, len(reds)-1)
-	sel = reds[x]
-	available = moveOptions(sel)
-	y = random.randint(0, len(available)-1)
-	tar = available[y]
-	if tiles[tar] == "none":
-		tiles[tar] = "Red"
-		curr = tar
-		tiles[sel] = "none"
-		if morrisChecker(curr) == False:
-			turn = turn + 1
-	else:
-		minimaxMove()
-
-def minimaxDeletion():
-	global turn
-	global curr
-	blues = getCurrColor("Blue")
-	x = random.randint(0, len(blues)-1)
-	rem = blues[x]
-	tiles[rem] = "none"
-	curr = "none"
-	turn = turn + 1
-
-
 while(True):
 	for event in pg.event.get():
 		if event.type == QUIT:
@@ -370,24 +314,16 @@ while(True):
 	draw()
 
 	if morrisChecker(curr):
-		if turn % 2 == 0:
+		if event.type == pg.MOUSEBUTTONUP:
 			deletion()
-		else:
-			minimaxDeletion()
-	elif event.type == pg.MOUSEBUTTONUP:
+	elif event.type == pg.MOUSEBUTTONDOWN:
 		if(turn < 12):
-			if turn % 2 == 0:
-				place()
-			else:
-				minimaxPlace()
+			place()
 		else:
 			winCheck = winner()
 			if winCheck == "none":
-				if turn % 2 == 0:
-					moveSelecter()
-					moveHelper()
-				else:
-					minimaxMove()
+				moveSelecter()
+				moveHelper()
 			else:
 				screen.fill(boardColor)
 
