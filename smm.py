@@ -81,7 +81,7 @@ def draw():
 	else:
 		player = "Blue"
 
-	#This is all fro displaying text in the center of the screen
+	#This is all for displaying text in the center of the screen
 	font = pg.font.Font('freesansbold.ttf', 32)
 	text1 = font.render('Turn = ' + str(turn + 1), True, black, boardColor)
 	text2 = font.render('It is ' + player + '\'s turn' , True, black, boardColor)
@@ -118,7 +118,7 @@ def draw():
 		elif(tiles[tile] == "Red"):
 			pg.draw.circle(screen, red, coordDict[tile], 40)
 
-	#This is for drawing the selected tile
+	#This is for highlighting the selected tile
 	if(selected != "none"):
 		pg.draw.circle(screen, yellow, selected, 40, width = 10)
 
@@ -126,15 +126,20 @@ def draw():
 turn = 0
 #This function is for placing down tiles
 def place():
+	global curr
+	global turn
 	for key in coordDict:
 		if tiles[key] == "none":
 			if coordDict[key][0]-40 <= x <= coordDict[key][0]+40 and coordDict[key][1]-40 <= y <= coordDict[key][1]+40:
-				global turn
-				turn = turn + 1
-				if(turn % 2 == 1):
+				curr = (list(coordDict.keys())[list(coordDict.values()).index(coordDict[key])])
+				if(turn % 2 == 0):
 					tiles[key] = "Blue"
 				else:
 					tiles[key] = "Red"
+
+
+				if morrisChecker(curr) == False:
+					turn = turn + 1
 
 
 selected = "none"
@@ -153,6 +158,7 @@ def moveSelecter():
 					if(tiles[key]) == "Blue":
 						selected = coordDict[key]
 
+curr = "none"
 #This function draws a tile where the user chooses to move to as well as removing the tile from the old spot
 def moveHelper():
 	global selected
@@ -162,9 +168,9 @@ def moveHelper():
 		for key in coordDict:
 			if tiles[key] == "none":
 				if coordDict[key][0]-40 <= x <= coordDict[key][0]+40 and coordDict[key][1]-40 <= y <= coordDict[key][1]+40:
+					global curr
 					curr = (list(coordDict.keys())[list(coordDict.values()).index(coordDict[key])])
 					prev = (list(coordDict.keys())[list(coordDict.values()).index(selected)])
-					print(curr)
 					if key in moveOptions(prev):
 						for coord in coordDict:
 							if(selected == coordDict[coord]):
@@ -175,7 +181,8 @@ def moveHelper():
 							tiles[key] = "Red"
 
 						selected = "none"
-						turn = turn + 1
+						if morrisChecker(curr) == False:
+							turn = turn + 1
 
 
 #This functions return whether or not a move is valid or not
@@ -200,37 +207,61 @@ def moveOptions(prev):
 	}
 	return validMoves[prev]
 
+
+#This function picks which tile the user has selected
+def deletion():
+	global curr
+	global turn
+	x, y = pg.mouse.get_pos()
+	for key in coordDict:
+		if tiles[key] != "none":
+			if coordDict[key][0]-40 <= x <= coordDict[key][0]+40 and coordDict[key][1]-40 <= y <= coordDict[key][1]+40:
+				global turn
+				if(turn % 2 == 1):
+					if(tiles[key]) == "Blue":
+						tiles[key] = "none"
+						curr = "none"
+						turn = turn + 1
+				else:
+					if(tiles[key]) == "Red":
+						tiles[key] = "none"
+						curr = "none"
+						turn = turn + 1
+
+
 #[WORK IN PROGRESS]
 def morrisChecker(tile):
 	piece = tile
-	morris = "none"
+	line = []
 
 	if tiles["a"] == tiles["b"] == tiles["c"] and tiles["a"] != "none":
-		morris = tiles["a"]
+		line = ["a", "b", "c"]
 
 	if tiles["a"] == tiles["h"] == tiles["g"] and tiles["a"] != "none":
-		morris = tiles["a"]
+		line = ["a", "h", "g"]
 
 	if tiles["c"] == tiles["d"] == tiles["e"] and tiles["e"] != "none":
-		morris = tiles["e"]
+		line = ["c", "d", "e"]
 
 	if tiles["e"] == tiles["f"] == tiles["g"] and tiles["e"] != "none":
-		morris = tiles["e"]
+		line = ["e", "f", "g"]
 
 	if tiles["j"] == tiles["k"] == tiles["l"] and tiles["j"] != "none":
-		morris = tiles["j"]
+		line = ["j", "k", "l"]
 
 	if tiles["j"] == tiles["i"] == tiles["p"] and tiles["j"] != "none":
-		morris = tiles["j"]
+		line = ["j", "i", "p"]
 
 	if tiles["l"] == tiles["m"] == tiles["n"] and tiles["n"] != "none":
-		morris = tiles["n"]
+		line = ["l", "m", "n"]
 
 	if tiles["n"] == tiles["o"] == tiles["p"] and tiles["n"] != "none":
-		morris = tiles["n"]
+		line = ["n", "o", "p"]
 
-	return morris
-
+	if piece in line:
+		return True
+	else:
+		return False
 
 
 
@@ -244,10 +275,13 @@ while(True):
 
 	draw()
 
-	if event.type == pg.MOUSEBUTTONDOWN:
-		if(turn < 6):
+	if morrisChecker(curr):
+		if event.type == pg.MOUSEBUTTONUP:
+			deletion()
+	elif event.type == pg.MOUSEBUTTONDOWN:
+		if(turn < 12):
 			place()
-		elif(turn < 16):
+		elif(turn < 32):
 			moveSelecter()
 			moveHelper()
 
