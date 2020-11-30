@@ -82,16 +82,25 @@ def draw():
 		player = "Blue"
 
 	#This is all for displaying text in the center of the screen
-	font = pg.font.Font('freesansbold.ttf', 32)
-	text1 = font.render('Turn = ' + str(turn + 1), True, black, boardColor)
-	text2 = font.render('It is ' + player + '\'s turn' , True, black, boardColor)
-	textRect1 = text1.get_rect()
-	textRect2 = text2.get_rect()
-	textRect1.center = ((w // 2) + 17, (h // 2) + 17)
-	textRect2.center = ((w // 2) - 17, (h // 2) - 17)
+	winCheck = winner()
+	if winCheck == "none" or turn < 12:
+		font = pg.font.Font('freesansbold.ttf', 32)
+		text1 = font.render('Turn = ' + str(turn + 1), True, black, boardColor)
+		text2 = font.render('It is ' + player + '\'s turn' , True, black, boardColor)
+		textRect1 = text1.get_rect()
+		textRect2 = text2.get_rect()
+		textRect1.center = ((w // 2) + 17, (h // 2) + 17)
+		textRect2.center = ((w // 2) - 17, (h // 2) - 17)
 
-	screen.blit(text1, textRect1)
-	screen.blit(text2, textRect2)
+		screen.blit(text1, textRect1)
+		screen.blit(text2, textRect2)
+	else:
+		font = pg.font.Font('freesansbold.ttf', 32)
+		text3 = font.render(winCheck + ' wins!', True, black, boardColor)
+		textRect3 = text3.get_rect()
+		textRect3.center = ((w // 2) + 17, (h // 2) + 17)
+		screen.blit(text3, textRect3)
+
 
 	# drawing outter Box
 	pg.draw.line(screen, black, coordDict["a"], coordDict["c"], 7)
@@ -264,6 +273,23 @@ def morrisChecker(tile):
 		return False
 
 
+def winner():
+	blueTotal = 0
+	redTotal = 0
+	victor = "none"
+	for x in coordDict:
+		if tiles[x] == "Blue":
+			blueTotal = blueTotal + 1
+		elif tiles[x] == "Red":
+			redTotal = redTotal + 1
+	if blueTotal == 2 or redTotal == 2:
+		if blueTotal == 2:
+			victor = "Red"
+		else:
+
+			victor = "Blue"
+	return victor
+
 
 while(True):
 	for event in pg.event.get():
@@ -281,9 +307,13 @@ while(True):
 	elif event.type == pg.MOUSEBUTTONDOWN:
 		if(turn < 12):
 			place()
-		elif(turn < 32):
-			moveSelecter()
-			moveHelper()
+		else:
+			winCheck = winner()
+			if winCheck == "none":
+				moveSelecter()
+				moveHelper()
+			else:
+				screen.fill(boardColor)
 
 	# This is drawing black dots and making them gray when hovered
 	for key in coordDict:
