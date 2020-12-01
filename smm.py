@@ -374,7 +374,7 @@ while(True):
 			deletion()
 		else:
 			minimaxDeletion()
-	elif event.type == pg.MOUSEBUTTONUP:
+	elif event.type == pg.MOUSEBUTTONDOWN:
 		if(turn < 12):
 			if turn % 2 == 0:
 				place()
