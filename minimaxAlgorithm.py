@@ -3,9 +3,6 @@ import copy
 import math
 import random
 
-#tiles = getCurrTiles()
-
-
 # This is our heuristic. Each combination of Red, Blue, or none on
 # the sides of the inner and outer squares are labeled as to how much they are worth
 scores = {
@@ -68,25 +65,6 @@ def getCurrColor(board, color):
 			currColorList.append(x)
 	return currColorList
 
-
-# tiles={
-# 	"a" : "none",
-# 	"b" : "Red",
-# 	"c" : "none",
-# 	"d" : "none",
-# 	"e" : "none",
-# 	"f" : "none",
-# 	"g" : "none",
-# 	"h" : "none",
-# 	"i" : "none",
-# 	"j" : "none",
-# 	"k" : "none",
-# 	"l" : "none",
-# 	"m" : "none",
-# 	"n" : "none",
-# 	"o" : "none",
-# 	"p" : "none",
-# }
 
 # The is a dictionary of every space on the board and every place a tile could move to
 # from this location
@@ -156,6 +134,14 @@ def morrisChecker(tiles, most_recent_move):
 	return False
 
 
+def placeOptions(board):
+    options = []
+    for tile in board:
+        if board[tile] == "none":
+            options.append(tile)
+    return options
+
+
 class Tree:
     def __init__(self, parent, boardState, lastMove):
         self.root = Node(parent, boardState, lastMove)
@@ -201,6 +187,48 @@ class Tree:
                             childrenNodes[len(childrenNodes) - 1].children = None
                         else:
                             childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
+        return(childrenNodes)
+
+
+class PlacementTree:
+    def __init__(self, parent, boardState, lastMove):
+        self.root = Node(parent, boardState, lastMove)
+        self.root.children = self.child(self.root, "Red", 0)
+
+    def __str__(self):
+        return self.root.__str__(0)
+
+    root = None
+    maxDepth = 3
+
+    def child(self, node, color, depth):
+        if depth == self.maxDepth:
+            return None
+        other = "Red"
+        if color == "Red":
+            other = "Blue"
+        # tileColorTotal is a list of the tiles that are = color
+        currTileColorTotal = getCurrColor(node.boardState.copy(), color)
+        otherTileColorTotal = getCurrColor(node.boardState.copy(), other)
+        childrenNodes = []
+        options = placeOptions(node.boardState)
+        for opt in options:
+            tmpBoardState = copy.deepcopy(node.boardState)
+            tmpBoardState[opt] = color
+            if morrisChecker(tmpBoardState, opt):
+                for otherTile in otherTileColorTotal:
+                    tmpBoardState[otherTile] = "none"
+                    childrenNodes.append(Node(parent=node, boardState=tmpBoardState, lastMove = { "color": color, "pieceIdx": opt, "movePos": opt, "deleted": otherTile }))
+                    if depth == self.maxDepth:
+                        childrenNodes[len(childrenNodes) - 1].children = None
+                    else:
+                        childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
+            else:
+                childrenNodes.append(Node(parent=node, boardState=tmpBoardState, lastMove = { "color": color, "pieceIdx": opt, "movePos": opt, "deleted": "none" }))
+                if depth == self.maxDepth:
+                    childrenNodes[len(childrenNodes) - 1].children = None
+                else:
+                    childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
         return(childrenNodes)
 
 
@@ -267,7 +295,6 @@ def minimax(node, is_max_turn, depth, depthValue):
             node.minimaxVal = minNode.minimaxVal
 
 
-
 def getBotBestBoardState(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = Tree(None, board.copy(), temp)
@@ -280,5 +307,13 @@ def getBotBestBoardState(board):
     return nextMove
 
 
-
-#print(getBotBestBoardState(tiles))
+def getBotBestBoardStatePlacement(board):
+    temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
+    tree = PlacementTree(None, board.copy(), temp)
+    minimax(tree.root, True)
+    nextMove =""
+    for child in tree.root.children:
+        if tree.root.minimaxVal == child.minimaxVal:
+            nextMove = child.lastMove
+            break
+    return nextMove
