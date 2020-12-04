@@ -468,7 +468,7 @@ redWins = 0
 draws = 0
 turns = 0
 print("Loading...")
-iterations = 100
+iterations = 1000
 for i in range(iterations):
     progressBar(i, iterations, 50)
     ret = runRandomBot()
