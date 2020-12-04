@@ -320,21 +320,21 @@ def getCurrColor(color):
 	return currColorList
 
 
-def minimaxPlace():
-	global turn
-	global curr
-	x = random.randint(0, 15)
-	temp = []
-	for y in tiles:
-		temp.append(y)
-	next = temp[x]
-	if tiles[next] == "none":
-		tiles[next] = "Red"
-		curr = next
-		if morrisChecker(curr) == False:
-			turn = turn + 1
-	else:
-		minimaxPlace()
+# def minimaxPlace():
+# 	global turn
+# 	global curr
+# 	x = random.randint(0, 15)
+# 	temp = []
+# 	for y in tiles:
+# 		temp.append(y)
+# 	next = temp[x]
+# 	if tiles[next] == "none":
+# 		tiles[next] = "Red"
+# 		curr = next
+# 		if morrisChecker(curr) == False:
+# 			turn = turn + 1
+# 	else:
+# 		minimaxPlace()
 
 # def minimaxMove():
 # 	global turn
@@ -365,19 +365,40 @@ def minimaxPlace():
 # 	turn = turn + 1
 
 
-def minimax():
+def minimaxMove():
+	global turn
+
 	decisions = getBotBestBoardState(tiles)
+
 	nextMove = decisions["movePos"]
 	prevMove = decisions["pieceIdx"]
 	toDelete = decisions["deleted"]
 
-	tiles[nextMove] = "Red"
 	curr = nextMove
+
+	tiles[nextMove] = "Red"
 	tiles[prevMove] = "none"
+
 	if toDelete != "none":
 		tiles[toDelete] = "none"
 
+	turn = turn + 1
+
+
+def minimaxPlace():
 	global turn
+
+	placements = getBotBestBoardStatePlacement(tiles)
+
+	placeDelete = placements["deleted"]
+	place = placements["movePos"]
+	tiles[place] = "Red"
+
+	curr = place
+
+	if placeDelete != "none":
+		tiles[placeDelete] = "none"
+
 	turn = turn + 1
 
 
@@ -396,7 +417,10 @@ while(True):
 		if turn % 2 == 0:
 			deletion()
 		else:
-			minimax()
+			if turn < 12:
+				minimaxPlace()
+			else:
+				minimaxMove()
 
 	elif event.type == pg.MOUSEBUTTONDOWN:
 		if(turn < 12):
@@ -411,7 +435,7 @@ while(True):
 					moveSelecter()
 					moveHelper()
 				else:
-					minimax()
+					minimaxMove()
 
 			else:
 				screen.fill(boardColor)
