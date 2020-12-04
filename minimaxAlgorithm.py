@@ -3,8 +3,8 @@ import copy
 import math
 import random
 
-def test():
-    print("Woo")
+#tiles = getCurrTiles()
+
 
 # This is our heuristic. Each combination of Red, Blue, or none on
 # the sides of the inner and outer squares are labeled as to how much they are worth
@@ -68,24 +68,24 @@ def getCurrColor(board, color):
 	return currColorList
 
 
-tiles={
-	"a" : "none",
-	"b" : "Red",
-	"c" : "none",
-	"d" : "none",
-	"e" : "none",
-	"f" : "none",
-	"g" : "none",
-	"h" : "none",
-	"i" : "none",
-	"j" : "none",
-	"k" : "none",
-	"l" : "none",
-	"m" : "none",
-	"n" : "none",
-	"o" : "none",
-	"p" : "none",
-}
+# tiles={
+# 	"a" : "none",
+# 	"b" : "Red",
+# 	"c" : "none",
+# 	"d" : "none",
+# 	"e" : "none",
+# 	"f" : "none",
+# 	"g" : "none",
+# 	"h" : "none",
+# 	"i" : "none",
+# 	"j" : "none",
+# 	"k" : "none",
+# 	"l" : "none",
+# 	"m" : "none",
+# 	"n" : "none",
+# 	"o" : "none",
+# 	"p" : "none",
+# }
 
 # The is a dictionary of every space on the board and every place a tile could move to
 # from this location
@@ -261,7 +261,7 @@ def getBotBestBoardState(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = Tree(None, board.copy(), temp)
     minimax(tree.root, True)
-    nextMove =""
+    nextMove = temp
     for child in tree.root.children:
         if tree.root.minimaxVal == child.minimaxVal:
             nextMove = child.lastMove
@@ -270,4 +270,4 @@ def getBotBestBoardState(board):
 
 
 
-print(getBotBestBoardState(tiles))
+#print(getBotBestBoardState(tiles))

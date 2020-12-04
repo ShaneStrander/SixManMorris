@@ -6,6 +6,8 @@ from pygame.locals import *
 
 import random
 
+from minimaxAlgorithm import *
+
 
 # set width and height of the game window
 w = 800
@@ -74,6 +76,9 @@ tiles={
 	"o" : "none",
 	"p" : "none",
 }
+
+def getCurrTiles():
+	return tiles
 
 #This function draws everything every game loop
 def draw():
@@ -331,38 +336,52 @@ def minimaxPlace():
 	else:
 		minimaxPlace()
 
-def minimaxMove():
-	global turn
-	global curr
-	reds = getCurrColor("Red")
-	x = random.randint(0, len(reds)-1)
-	sel = reds[x]
-	available = moveOptions(sel)
-	y = random.randint(0, len(available)-1)
-	tar = available[y]
-	if tiles[tar] == "none":
-		tiles[tar] = "Red"
-		curr = tar
-		tiles[sel] = "none"
-		if morrisChecker(curr) == False:
-			turn = turn + 1
-	else:
-		minimaxMove()
+# def minimaxMove():
+# 	global turn
+# 	global curr
+# 	reds = getCurrColor("Red")
+# 	x = random.randint(0, len(reds)-1)
+# 	sel = reds[x]
+# 	available = moveOptions(sel)
+# 	y = random.randint(0, len(available)-1)
+# 	tar = available[y]
+# 	if tiles[tar] == "none":
+# 		tiles[tar] = "Red"
+# 		curr = tar
+# 		tiles[sel] = "none"
+# 		if morrisChecker(curr) == False:
+# 			turn = turn + 1
+# 	else:
+# 		minimaxMove()
+#
+# def minimaxDeletion():
+# 	global turn
+# 	global curr
+# 	blues = getCurrColor("Blue")
+# 	x = random.randint(0, len(blues)-1)
+# 	rem = blues[x]
+# 	tiles[rem] = "none"
+# 	curr = "none"
+# 	turn = turn + 1
 
-def minimaxDeletion():
+
+def minimax():
+	decisions = getBotBestBoardState(tiles)
+	nextMove = decisions["movePos"]
+	prevMove = decisions["pieceIdx"]
+	toDelete = decisions["deleted"]
+
+	tiles[nextMove] = "Red"
+	curr = nextMove
+	tiles[prevMove] = "none"
+	if toDelete != "none":
+		tiles[toDelete] = "none"
+
 	global turn
-	global curr
-	blues = getCurrColor("Blue")
-	x = random.randint(0, len(blues)-1)
-	rem = blues[x]
-	tiles[rem] = "none"
-	curr = "none"
 	turn = turn + 1
 
 
 while(True):
-
-	
 
 	for event in pg.event.get():
 		if event.type == QUIT:
@@ -377,7 +396,8 @@ while(True):
 		if turn % 2 == 0:
 			deletion()
 		else:
-			minimaxDeletion()
+			minimax()
+
 	elif event.type == pg.MOUSEBUTTONDOWN:
 		if(turn < 12):
 			if turn % 2 == 0:
@@ -391,7 +411,8 @@ while(True):
 					moveSelecter()
 					moveHelper()
 				else:
-					minimaxMove()
+					minimax()
+
 			else:
 				screen.fill(boardColor)
 
