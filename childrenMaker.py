@@ -316,19 +316,19 @@ def getBotBestBoardState(board):
     return nextMove
 
 def rearrangeBoard():
-    arr = []
+    freeTiles = []
     for tile in tiles:
         tiles[tile] = "none"
-        arr.append(tile)
+        freeTiles.append(tile)
     for _ in range(5):
-        num = random.randint(0,len(arr)-1)
-        tiles[arr[num]] = "Blue"
-        del arr[num]
-
-    for _ in range(5):
-        num = random.randint(0,len(arr)-1)
-        tiles[arr[num]] = "Red"
-        del arr[num]
+        freeTiles = []
+        for tile in tiles:
+            if tiles[tile] == "none":
+                freeTiles.append(tile)
+        num = random.randint(0,len(freeTiles)-1)
+        tiles[freeTiles[num]] = "Blue"
+        move = getBotBestBoardStatePlacement(tiles)["movePos"]
+        tiles[move] = "Red"
 
 def runRandomBot():
     rearrangeBoard()
@@ -371,29 +371,6 @@ def runRandomBot():
     else:
         return 1
 
-
-# blueWins = 0
-# redWins = 0
-# draws = 0
-# print("Loading...")
-# for i in range(50):
-#     print("[]"*i + "--"*(49-i), end='\r')
-#     ret = runRandomBot()
-#     if ret == 0:
-#         blueWins = blueWins + 1
-#     elif ret == 1:
-#         redWins = redWins + 1
-#     else:
-#         draws = draws + 1
-
-# print("Blue won " + str(blueWins) + " times.")
-# print("Red won " + str(redWins) + " times.")
-# print("Red and Blue had " + str(draws) + " draws.")
-# total = redWins+blueWins+draws
-# if total == 0: total = 1
-# print("The win percentage for our bot is " + str(redWins*100 / (total)) + "%")
-
-
 def getBotBestBoardStatePlacement(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = PlacementTree(None, board.copy(), temp)
@@ -405,4 +382,25 @@ def getBotBestBoardStatePlacement(board):
             break
     return nextMove
 
-print(getBotBestBoardStatePlacement(tiles))
+
+
+blueWins = 0
+redWins = 0
+draws = 0
+print("Loading...")
+for i in range(50):
+    print("[]"*i + "--"*(49-i), end='\r')
+    ret = runRandomBot()
+    if ret == 0:
+        blueWins = blueWins + 1
+    elif ret == 1:
+        redWins = redWins + 1
+    else:
+        draws = draws + 1
+
+print("Blue won " + str(blueWins) + " times.")
+print("Red won " + str(redWins) + " times.")
+print("Red and Blue had " + str(draws) + " draws.")
+total = redWins+blueWins+draws
+if total == 0: total = 1
+print("The win percentage for our bot is " + str(redWins*100 / (total)) + "%")
