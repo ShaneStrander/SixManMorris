@@ -58,6 +58,7 @@ class Node:
     boardState =[]
     lastMove = { "color": "white", "pieceIdx": -1, "movePos": "a" }
     minimaxVal = 0
+    depthVal = None
 
 # This returns a list of the tiles on the board where the given color is
 def getCurrColor(board, color):
@@ -283,7 +284,7 @@ def getLeafNodes(node, finalNodes = []):
             getLeafNodes(child, finalNodes)
 
 
-def minimax(node, is_max_turn):
+def minimax(node, is_max_turn, depth, depthValue):
     if node.children == None or len(node.children) == 0:
         node.minimaxVal = score(node.boardState)
     else:
@@ -291,14 +292,24 @@ def minimax(node, is_max_turn):
             maxNode = node
             maxNode.minimaxVal = -9999
             for child in node.children:
-                minimax(child, False)
+                minimax(child, False, depth + 1, node.depthVal)
+                #pruning
+                if depthValue and child.minimaxVal >= depthValue:
+                    maxNode.minimaxVal = child.minimaxVal
+                    break
+                node.depthVal = maxNode.minimaxVal
                 maxNode.minimaxVal = max(maxNode.minimaxVal, child.minimaxVal)
             node.minimaxVal = maxNode.minimaxVal
         else:
             minNode = node
             minNode.minimaxVal = 9999
             for child in node.children:
-                minimax(child, True)
+                minimax(child, True, depth + 1, node.depthVal)
+                #pruning
+                if depthValue and child.minimaxVal <= depthValue:
+                    minNode.minimaxVal = child.minimaxVal
+                    break
+                node.depthVal = minNode.minimaxVal
                 minNode.minimaxVal = min(minNode.minimaxVal, child.minimaxVal)
             node.minimaxVal = minNode.minimaxVal
 
@@ -307,7 +318,7 @@ def minimax(node, is_max_turn):
 def getBotBestBoardState(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = Tree(None, board.copy(), temp)
-    minimax(tree.root, True)
+    minimax(tree.root, True, 0, tree.root.depthVal)
     nextMove =""
     for child in tree.root.children:
         if tree.root.minimaxVal == child.minimaxVal:
@@ -374,7 +385,7 @@ def runRandomBot():
 def getBotBestBoardStatePlacement(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = PlacementTree(None, board.copy(), temp)
-    minimax(tree.root, True)
+    minimax(tree.root, True, 0, tree.root.depthVal)
     nextMove =""
     for child in tree.root.children:
         if tree.root.minimaxVal == child.minimaxVal:
