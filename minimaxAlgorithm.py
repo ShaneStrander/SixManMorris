@@ -310,7 +310,7 @@ def getBotBestBoardState(board):
 def getBotBestBoardStatePlacement(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
     tree = PlacementTree(None, board.copy(), temp)
-    minimax(tree.root, True)
+    minimax(tree.root, True, 0, tree.root.depthVal)
     nextMove =""
     for child in tree.root.children:
         if tree.root.minimaxVal == child.minimaxVal:
