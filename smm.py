@@ -6,6 +6,7 @@ from pygame.locals import *
 
 import random
 
+
 # set width and height of the game window
 w = 800
 h = 800
@@ -360,6 +361,9 @@ def minimaxDeletion():
 
 
 while(True):
+
+	
+
 	for event in pg.event.get():
 		if event.type == QUIT:
 			pg.quit()
