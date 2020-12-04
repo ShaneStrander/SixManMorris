@@ -69,9 +69,9 @@ def getCurrColor(board, color):
 
 
 tiles={
-	"a" : "none",
+	"a" : "Red",
 	"b" : "none",
-	"c" : "none",
+	"c" : "Red",
 	"d" : "none",
 	"e" : "none",
 	"f" : "none",
@@ -79,11 +79,11 @@ tiles={
 	"h" : "none",
 	"i" : "none",
 	"j" : "none",
-	"k" : "none",
+	"k" : "Red",
 	"l" : "none",
 	"m" : "none",
 	"n" : "none",
-	"o" : "none",
+	"o" : "Blue",
 	"p" : "none",
 }
 
@@ -109,6 +109,13 @@ def moveOptions(pos):
 		"p" : ["i", "o"],
 	}
 	return validMoves[pos]
+
+def placeOptions(board):
+    options = []
+    for tile in board:
+        if board[tile] == "none":
+            options.append(tile)
+    return options
 
 # This checks if the most recent move is in a morris
 def morrisChecker(tiles, most_recent_move):
@@ -202,6 +209,46 @@ class Tree:
                             childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
         return(childrenNodes)
 
+class PlacementTree:
+    def __init__(self, parent, boardState, lastMove):
+        self.root = Node(parent, boardState, lastMove)
+        self.root.children = self.child(self.root, "Red", 0)
+
+    def __str__(self):
+        return self.root.__str__(0)
+
+    root = None
+    maxDepth = 3
+
+    def child(self, node, color, depth):
+        if depth == self.maxDepth:
+            return None
+        other = "Red"
+        if color == "Red":
+            other = "Blue"
+        # tileColorTotal is a list of the tiles that are = color
+        currTileColorTotal = getCurrColor(node.boardState.copy(), color)
+        otherTileColorTotal = getCurrColor(node.boardState.copy(), other)
+        childrenNodes = []
+        options = placeOptions(node.boardState)
+        for opt in options:
+            tmpBoardState = copy.deepcopy(node.boardState)
+            tmpBoardState[opt] = color
+            if morrisChecker(tmpBoardState, opt):
+                for otherTile in otherTileColorTotal:
+                    tmpBoardState[otherTile] = "none"
+                    childrenNodes.append(Node(parent=node, boardState=tmpBoardState, lastMove = { "color": color, "pieceIdx": opt, "movePos": opt, "deleted": otherTile }))
+                    if depth == self.maxDepth:
+                        childrenNodes[len(childrenNodes) - 1].children = None
+                    else:
+                        childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
+            else:
+                childrenNodes.append(Node(parent=node, boardState=tmpBoardState, lastMove = { "color": color, "pieceIdx": opt, "movePos": opt, "deleted": "none" }))
+                if depth == self.maxDepth:
+                    childrenNodes[len(childrenNodes) - 1].children = None
+                else:
+                    childrenNodes[len(childrenNodes) - 1].children = self.child(childrenNodes[len(childrenNodes) - 1], other, depth + 1)
+        return(childrenNodes)
 
 def score(boardState):
     sidesAlt = [["a", "b", "c"],
@@ -266,8 +313,6 @@ def getBotBestBoardState(board):
         if tree.root.minimaxVal == child.minimaxVal:
             nextMove = child.lastMove
             break
-    if nextMove == "":
-        print(pformat(tree.root.boardState))
     return nextMove
 
 def rearrangeBoard():
@@ -275,26 +320,26 @@ def rearrangeBoard():
     for tile in tiles:
         tiles[tile] = "none"
         arr.append(tile)
-    for i in range(5):
+    for _ in range(5):
         num = random.randint(0,len(arr)-1)
         tiles[arr[num]] = "Blue"
         del arr[num]
 
-    for i in range(5):
+    for _ in range(5):
         num = random.randint(0,len(arr)-1)
         tiles[arr[num]] = "Red"
         del arr[num]
 
 def runRandomBot():
     rearrangeBoard()
+
     exit = False
-    maxTurns = 100
+    maxTurns = 20
     turn = 0
     while len(getCurrColor(tiles, "Blue")) > 2 and len(getCurrColor(tiles, "Red")) > 2:
         if turn >= maxTurns:
             return 2
         turn = turn + 1
-        blue_has_moved = False
         curr = None
         blues = getCurrColor(tiles, "Blue")
         availableFound = False
@@ -327,21 +372,37 @@ def runRandomBot():
         return 1
 
 
-blueWins = 0
-redWins = 0
-draws = 0
-for i in range(50):
-    ret = runRandomBot()
-    if ret == 0:
-        blueWins = blueWins + 1
-    elif ret == 1:
-        redWins = redWins + 1
-    else:
-        draws = draws + 1
+# blueWins = 0
+# redWins = 0
+# draws = 0
+# print("Loading...")
+# for i in range(50):
+#     print("[]"*i + "--"*(49-i), end='\r')
+#     ret = runRandomBot()
+#     if ret == 0:
+#         blueWins = blueWins + 1
+#     elif ret == 1:
+#         redWins = redWins + 1
+#     else:
+#         draws = draws + 1
 
-print("Blue won " + str(blueWins) + " times.")
-print("Red won " + str(redWins) + " times.")
-print("Red and Blue had " + str(draws) + " draws.")
-total = redWins+blueWins+draws
-if total == 0: total = 1
-print("The win percentage for our bot is " + str(redWins*100 / (total)) + "%")
+# print("Blue won " + str(blueWins) + " times.")
+# print("Red won " + str(redWins) + " times.")
+# print("Red and Blue had " + str(draws) + " draws.")
+# total = redWins+blueWins+draws
+# if total == 0: total = 1
+# print("The win percentage for our bot is " + str(redWins*100 / (total)) + "%")
+
+
+def getBotBestBoardStatePlacement(board):
+    temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
+    tree = PlacementTree(None, board.copy(), temp)
+    minimax(tree.root, True)
+    nextMove =""
+    for child in tree.root.children:
+        if tree.root.minimaxVal == child.minimaxVal:
+            nextMove = child.lastMove
+            break
+    return nextMove
+
+print(getBotBestBoardStatePlacement(tiles))
