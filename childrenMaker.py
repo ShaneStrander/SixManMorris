@@ -8,7 +8,7 @@ def test():
 
 # This is our heuristic. Each combination of Red, Blue, or none on
 # the sides of the inner and outer squares are labeled as to how much they are worth
-scores = {
+neutralScores = {
     'xxx': 0,
     'xxb': -1,
     'xxr': 1,
@@ -98,6 +98,8 @@ defensiveScores = {
     'rrb': -10,
     'rrr': 10,
 }
+
+scores = defensiveScores
 
 
 class Node:
@@ -410,7 +412,7 @@ def runRandomBot():
     turn = 0
     while len(getCurrColor(tiles, "Blue")) > 2 and len(getCurrColor(tiles, "Red")) > 2:
         if turn >= maxTurns:
-            return 2
+            return {"winner": 2, "turns": turn}
         turn = turn + 1
         curr = None
         blues = getCurrColor(tiles, "Blue")
@@ -425,7 +427,7 @@ def runRandomBot():
                             availableFound = True
         if not availableFound:
             print("None found")
-            return 2
+            return {"winner": 2, "turns": turn}
         if morrisChecker(tiles, curr):
             reds = getCurrColor(tiles, "Red")
             x = random.randint(0, len(reds)-1)
@@ -439,9 +441,9 @@ def runRandomBot():
         if redMove["deleted"] != "none":
             tiles[redMove["deleted"]] = "none"
     if len(getCurrColor(tiles, "Blue")) > 2:
-        return 0
+        return {"winner": 0, "turns": turn}
     else:
-        return 1
+        return {"winner": 1, "turns": turn}
 
 def getBotBestBoardStatePlacement(board):
     temp = { "color": "white", "pieceIdx": -1, "movePos": "a", "deleted": "none" }
@@ -464,21 +466,27 @@ def progressBar(current, total, barLength = 20):
 blueWins = 0
 redWins = 0
 draws = 0
+turns = 0
 print("Loading...")
-iterations = 1000
+iterations = 100
 for i in range(iterations):
     progressBar(i, iterations, 50)
     ret = runRandomBot()
-    if ret == 0:
+    if ret["winner"] == 0:
         blueWins = blueWins + 1
-    elif ret == 1:
+    elif ret["winner"] == 1:
         redWins = redWins + 1
     else:
         draws = draws + 1
+    turns = turns + ret["turns"]
 
+avgTurns = turns/100
+
+print()
 print("Blue won " + str(blueWins) + " times.")
 print("Red won " + str(redWins) + " times.")
 print("Red and Blue had " + str(draws) + " draws.")
 total = redWins+blueWins+draws
 if total == 0: total = 1
 print("The win percentage for our bot is " + str(redWins*100 / (total)) + "%")
+print ("The average number of turns was " + str(avgTurns))
