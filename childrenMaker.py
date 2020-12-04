@@ -39,6 +39,67 @@ scores = {
 }
 
 
+offensiveScores = {
+    'xxx': 0,
+    'xxb': -1,
+    'xxr': 4,
+    'xbx': -1,
+    'xbb': -6,
+    'xbr': 0,
+    'xrx': 4,
+    'xrb': 0,
+    'xrr': 9,
+    'bxx': -1,
+    'bxb': -6,
+    'bxr': 0,
+    'bbx': -6,
+    'bbb': -10,
+    'bbr': 10,
+    'brx': 0,
+    'brb': 10,
+    'brr': -7,
+    'rxx': 4,
+    'rxb': 0,
+    'rxr': 9,
+    'rbx': 0,
+    'rbb': 10,
+    'rbr': -7,
+    'rrx': 9,
+    'rrb': -7,
+    'rrr': 13,
+}
+
+defensiveScores = {
+    'xxx': 0,
+    'xxb': -4,
+    'xxr': 1,
+    'xbx': -4,
+    'xbb': -9,
+    'xbr': 0,
+    'xrx': 1,
+    'xrb': 0,
+    'xrr': 6,
+    'bxx': -3,
+    'bxb': -9,
+    'bxr': 0,
+    'bbx': -9,
+    'bbb': -13,
+    'bbr': 7,
+    'brx': 0,
+    'brb': 7,
+    'brr': -10,
+    'rxx': 1,
+    'rxb': 0,
+    'rxr': 6,
+    'rbx': 0,
+    'rbb': 7,
+    'rbr': -10,
+    'rrx': 6,
+    'rrb': -10,
+    'rrr': 10,
+}
+
+
 class Node:
     def __init__(self, parent, boardState, lastMove):
         self.parent = parent
