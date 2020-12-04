@@ -382,14 +382,20 @@ def getBotBestBoardStatePlacement(board):
             break
     return nextMove
 
+def progressBar(current, total, barLength = 20):
+    percent = float(current) * 100 / total
+    arrow   = '-' * int(percent/100 * barLength - 1) + '>'
+    spaces  = ' ' * (barLength - len(arrow))
 
+    print('Progress: [%s%s] %d %%' % (arrow, spaces, percent), end='\r')
 
 blueWins = 0
 redWins = 0
 draws = 0
 print("Loading...")
-for i in range(50):
-    print("[]"*i + "--"*(49-i), end='\r')
+iterations = 1000
+for i in range(iterations):
+    progressBar(i, iterations, 50)
     ret = runRandomBot()
     if ret == 0:
         blueWins = blueWins + 1
