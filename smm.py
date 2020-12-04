@@ -320,51 +320,6 @@ def getCurrColor(color):
 	return currColorList
 
 
-# def minimaxPlace():
-# 	global turn
-# 	global curr
-# 	x = random.randint(0, 15)
-# 	temp = []
-# 	for y in tiles:
-# 		temp.append(y)
-# 	next = temp[x]
-# 	if tiles[next] == "none":
-# 		tiles[next] = "Red"
-# 		curr = next
-# 		if morrisChecker(curr) == False:
-# 			turn = turn + 1
-# 	else:
-# 		minimaxPlace()
-
-# def minimaxMove():
-# 	global turn
-# 	global curr
-# 	reds = getCurrColor("Red")
-# 	x = random.randint(0, len(reds)-1)
-# 	sel = reds[x]
-# 	available = moveOptions(sel)
-# 	y = random.randint(0, len(available)-1)
-# 	tar = available[y]
-# 	if tiles[tar] == "none":
-# 		tiles[tar] = "Red"
-# 		curr = tar
-# 		tiles[sel] = "none"
-# 		if morrisChecker(curr) == False:
-# 			turn = turn + 1
-# 	else:
-# 		minimaxMove()
-#
-# def minimaxDeletion():
-# 	global turn
-# 	global curr
-# 	blues = getCurrColor("Blue")
-# 	x = random.randint(0, len(blues)-1)
-# 	rem = blues[x]
-# 	tiles[rem] = "none"
-# 	curr = "none"
-# 	turn = turn + 1
-
-
 def minimaxMove():
 	global turn
 
