@@ -212,7 +212,7 @@ class Tree:
         return self.root.__str__(0)
 
     root = None
-    maxDepth = 4
+    maxDepth = 6
 
     def child(self, node, color, depth):
         if depth == self.maxDepth:
@@ -304,6 +304,11 @@ def score(boardState):
                 ["p", "i", "j"]]
 
     score = 0
+    blueNum = len(getCurrColor(boardState, "Blue"))
+    adv = (len(getCurrColor(boardState, "Red")) - blueNum)*100
+    win = 0
+    if blueNum <= 2:
+        win = 1000
     for side in sidesAlt:
         str = ""
         for x in side:
@@ -315,7 +320,7 @@ def score(boardState):
             else:
                 str += "x"
         score += scores[str]
-    return score
+    return score + adv + win
 
 
 def getLeafNodes(node, finalNodes = []):
